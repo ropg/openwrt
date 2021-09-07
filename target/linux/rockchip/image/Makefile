@@ -45,6 +45,21 @@ define Build/pine64-img
 	dd if="$(STAGING_DIR_IMAGE)"/$(UBOOT_DEVICE_NAME)-u-boot.itb of="$@" seek=16384 conv=notrunc
 endef
 
+define Build/nanopi-r2s-img
+	# Creates condensed image for NanoPi R2S that fits in 16 MB
+	# To make this happen, in .config, set:
+	#	CONFIG_TARGET_KERNEL_PARTSIZE=12
+	#	CONFIG_TARGET_ROOTFS_PARTSIZE=3
+	# And in build_dir/target-aarch64_generic_musl/u-boot-nanopi-r2s-rk3328/u-boot-2021.01
+	#	CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR=0x120
+	./gen_image_nanopi_r2s.sh \
+		$@ \
+		$(CONFIG_TARGET_KERNEL_PARTSIZE) $@.boot \
+		$(CONFIG_TARGET_ROOTFS_PARTSIZE) $(IMAGE_ROOTFS) \
+		$(STAGING_DIR_IMAGE)/$(UBOOT_DEVICE_NAME)
+endef
+
+
 ### Devices ###
 define Device/Default
   PROFILES := Default
